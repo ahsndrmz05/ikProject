@@ -1,37 +1,31 @@
-# ikproject
+1. Proje Özeti:
+Şirketlerin personel verilerini, izinlerini ve genel durumlarını yönetebileceği, modern, hızlı ve responsive bir web arayüzü.
 
-This template should help get you started developing with Vue 3 in Vite.
+2. Temel Modüller (MVP - Minimum Viable Product):
 
-## Recommended IDE Setup
+Kimlik Doğrulama (Auth): Giriş, çıkış, şifre sıfırlama (Admin ve Çalışan rolleri).
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Dashboard (Özet Ekranı): Toplam çalışan sayısı, onay bekleyen izinler, yaklaşan doğum günleri/resmi tatiller (Grafiksel gösterimler eklenebilir).
 
-## Recommended Browser Setup
+Personel Yönetimi:
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+Çalışan listeleme (Arama, filtreleme, sayfalama).
 
-## Customize configuration
+Yeni çalışan ekleme / düzenleme / silme (CRUD işlemleri).
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+Çalışan detay sayfası (Kişisel bilgiler, departman, maaş vb.).
 
-## Project Setup
+İzin Yönetimi: İzin talebi oluşturma, geçmiş izinleri görüntüleme, admin için onay/red mekanizması.
 
-```sh
-npm install
-```
+3. Teknik Gereksinimler:
 
-### Compile and Hot-Reload for Development
+Framework: Vue 3 (Composition API & <script setup> syntax).
 
-```sh
-npm run dev
-```
+State Management: Pinia (Kullanıcı oturumu, personel listesi önbelleği için).
 
-### Compile and Minify for Production
+HTTP İstemcisi: Axios (Backend istekleri ve interceptor'lar üzerinden token yönetimi).
+
+UI / Stil: PrimeVue (DataTable, Dialog, Toast, Card vb.) ve PrimeFlex (Grid sistemi ve margin/padding ayarları için).duction
 
 ```sh
 npm run build
