@@ -73,7 +73,6 @@ import { useAuthStore } from '@/stores/authStore';
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
-import { useAuthStore } from '@/stores/authStore';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -84,13 +83,11 @@ const password = ref('');
 const handleLogin = async () => {
   if (!email.value || !password.value) return;
   
-  // AuthStore'daki login fonksiyonunu tetikle
   const basarili = await authStore.login(email.value, password.value);
   
   if (basarili) {
-    router.push({ name: 'dashboard' }); // Giriş başarılıysa yönlendir
+    router.push({ name: 'dashboard' });
   } else {
-    // Burada hata mesajı gösterilebilir
     console.error(authStore.error);
   }
 };
