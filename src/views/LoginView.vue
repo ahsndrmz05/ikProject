@@ -69,27 +69,30 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/authStore';
 import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
+import { useAuthStore } from '@/stores/authStore';
 
 const router = useRouter();
+const authStore = useAuthStore();
+
 const email = ref('');
 const password = ref('');
-const isLoading = ref(false);
 
-const handleLogin = () => {
+const handleLogin = async () => {
   if (!email.value || !password.value) return;
   
-  isLoading.value = true;
+  // AuthStore'daki login fonksiyonunu tetikle
+  const basarili = await authStore.login(email.value, password.value);
   
-  // Backend'e istek atıyormuş gibi simüle ediyoruz
-  setTimeout(() => {
-    // Şimdilik token'ı localStorage'a manuel yazıyoruz
-    localStorage.setItem('token', 'fake-jwt-token-12345');
-    isLoading.value = false;
-    router.push({ name: 'dashboard' }); // Giriş başarılıysa Dashboard'a yönlendir
-  }, 1000);
+  if (basarili) {
+    router.push({ name: 'dashboard' }); // Giriş başarılıysa yönlendir
+  } else {
+    // Burada hata mesajı gösterilebilir
+    console.error(authStore.error);
+  }
 };
 </script>
 
