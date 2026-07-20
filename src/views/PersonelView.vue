@@ -1,7 +1,5 @@
 <template>
   <div class="flex flex-column gap-4">
-    
-    <!-- Üst Bilgi ve Aksiyon -->
     <header class="flex justify-content-between align-items-center mb-2">
       <div>
         <h1 class="text-3xl font-bold text-white m-0">Personel Yönetimi</h1>
@@ -10,10 +8,8 @@
       <Button label="Yeni Personel" icon="pi pi-user-plus" class="p-button-help border-round-xl font-bold shadow-4" @click="openNewDialog" />
     </header>
 
-    <!-- Personel Listesi Tablosu -->
     <Card class="bg-gray-900 border-none border-round-3xl shadow-4">
       <template #content>
-        <!-- Store üzerinden verileri ve loading durumunu bağlıyoruz -->
         <DataTable :value="personelStore.personeller" :loading="personelStore.loading" responsiveLayout="scroll" :paginator="true" :rows="8" class="p-datatable-sm" :pt="{
           root: { class: 'border-round-2xl overflow-hidden border-1 border-gray-800' },
           headerRow: { class: 'bg-black' }
@@ -39,8 +35,8 @@
           <Column header="İşlemler" :exportable="false" style="min-width:8rem">
             <template #body="slotProps">
               <div class="flex gap-2">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info" aria-label="Düzenle" @click="editPersonel(slotProps.data)" />
-                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" aria-label="Sil" @click="deletePersonel(slotProps.data)" />
+                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info" @click="editPersonel(slotProps.data)" />
+                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="deletePersonel(slotProps.data)" />
               </div>
             </template>
           </Column>
@@ -48,7 +44,6 @@
       </template>
     </Card>
 
-    <!-- Yeni Ekleme / Düzenleme Modalı -->
     <Dialog v-model:visible="dialogGoster" :header="dialogBaslik" :modal="true" class="p-fluid" :style="{ width: '450px' }" :pt="{
       root: { class: 'border-round-3xl border-1 border-accent-purple bg-gray-900 overflow-hidden' },
       header: { class: 'bg-black text-white' },
@@ -57,30 +52,26 @@
     }">
       <div class="flex flex-column gap-4">
         <div class="flex flex-column gap-2">
-          <label for="adSoyad" class="text-300 font-medium text-sm ml-1">Ad Soyad</label>
-          <InputText id="adSoyad" v-model="seciliPersonel.adSoyad" autofocus class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
+          <label class="text-300 font-medium text-sm ml-1">Ad Soyad</label>
+          <InputText v-model="seciliPersonel.adSoyad" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
         </div>
-        
         <div class="flex flex-column gap-2">
-          <label for="departman" class="text-300 font-medium text-sm ml-1">Departman</label>
-          <InputText id="departman" v-model="seciliPersonel.departman" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
+          <label class="text-300 font-medium text-sm ml-1">Departman</label>
+          <InputText v-model="seciliPersonel.departman" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
         </div>
-        
         <div class="flex flex-column gap-2">
-          <label for="unvan" class="text-300 font-medium text-sm ml-1">Ünvan</label>
-          <InputText id="unvan" v-model="seciliPersonel.unvan" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
+          <label class="text-300 font-medium text-sm ml-1">Ünvan</label>
+          <InputText v-model="seciliPersonel.unvan" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
         </div>
       </div>
 
       <template #footer>
         <div class="flex justify-content-end gap-2 mt-3">
           <Button label="İptal" icon="pi pi-times" class="p-button-text p-button-secondary border-round-xl" @click="dialogGoster = false"/>
-          <!-- Kaydet butonuna asenkron yükleme (loading) durumu eklenebilir -->
           <Button label="Kaydet" icon="pi pi-check" class="p-button-help border-round-xl" @click="savePersonel" />
         </div>
       </template>
     </Dialog>
-
   </div>
 </template>
 
@@ -93,17 +84,13 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
-import { usePersonelStore } from '@/stores/personelStore';
 
-// Store bağlantısını kur
 const personelStore = usePersonelStore();
 
-// Sayfa yüklendiğinde API'den personelleri çek (GET)
 onMounted(() => {
   personelStore.fetchPersoneller();
 });
 
-// Modal State Yönetimi
 const dialogGoster = ref(false);
 const dialogBaslik = ref('');
 const seciliPersonel = ref({});
@@ -124,53 +111,24 @@ const editPersonel = (personel) => {
 };
 
 const savePersonel = async () => {
-  // Basit doğrulama (Validation)
-  if (seciliPersonel.value.adSoyad.trim()) {
-    try {
-      if (isEdit.value) {
-        // Backend'e güncelleme isteği at (PUT)
-        await personelStore.updatePersonel(seciliPersonel.value.id, seciliPersonel.value);
-      } else {
-        // Backend'e yeni kayıt isteği at (POST)
-        await personelStore.addPersonel(seciliPersonel.value);
-      }
-      dialogGoster.value = false;
-    } catch (error) {
-      console.error("Kayıt işlemi sırasında hata oluştu.", error);
+  if (seciliPersonel.value.adSoyad?.trim()) {
+    if (isEdit.value) {
+      await personelStore.updatePersonel(seciliPersonel.value.id, seciliPersonel.value);
+    } else {
+      await personelStore.addPersonel(seciliPersonel.value);
     }
+    dialogGoster.value = false;
   }
 };
 
 const deletePersonel = async (personel) => {
-  try {
-    // Backend'e silme isteği at (DELETE)
-    await personelStore.deletePersonel(personel.id);
-  } catch (error) {
-    console.error("Silme işlemi sırasında hata oluştu.", error);
-  }
+  await personelStore.deletePersonel(personel.id);
 };
 </script>
 
 <style scoped>
-/* PrimeVue Tablo Özelleştirmeleri (Koyu Tema) */
-:deep(.p-datatable .p-datatable-thead > tr > th) {
-  background-color: #050505 !important;
-  color: #a855f7 !important;
-  border-bottom: 1px solid #1f1f1f;
-  padding: 1rem;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr) {
-  background-color: #0a0a0a !important;
-  transition: background-color 0.2s;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr:hover) {
-  background-color: #141414 !important;
-}
-
-:deep(.p-datatable .p-datatable-tbody > tr > td) {
-  border-bottom: 1px solid #1f1f1f;
-  padding: 1rem;
-}
+:deep(.p-datatable .p-datatable-thead > tr > th) { background-color: #050505 !important; color: #a855f7 !important; border-bottom: 1px solid #1f1f1f; padding: 1rem; }
+:deep(.p-datatable .p-datatable-tbody > tr) { background-color: #0a0a0a !important; transition: background-color 0.2s; }
+:deep(.p-datatable .p-datatable-tbody > tr:hover) { background-color: #141414 !important; }
+:deep(.p-datatable .p-datatable-tbody > tr > td) { border-bottom: 1px solid #1f1f1f; padding: 1rem; }
 </style>
