@@ -21,17 +21,13 @@
             </div>
           </template>
           
-          <Column field="adSoyad" header="Ad Soyad" class="text-white font-bold"></Column>
+          <Column field="ad" header="Ad" class="text-white font-bold"></Column>
+          <Column field="soyad" header="Soyad" class="text-white font-bold"></Column>
+          <Column field="email" header="E-Posta" class="text-400"></Column>
           <Column field="departman" header="Departman" class="text-400"></Column>
-          <Column field="unvan" header="Ünvan" class="text-400"></Column>
-          <Column field="durum" header="Durum">
-            <template #body="slotProps">
-              <span :class="['px-3 py-1 border-round-3xl text-xs font-bold uppercase tracking-wide', 
-                slotProps.data.durum === 'Aktif' ? 'bg-green-900 text-green-400' : 'bg-red-900 text-red-400']">
-                {{ slotProps.data.durum }}
-              </span>
-            </template>
-          </Column>
+          <Column field="maas" header="Maaş" class="text-400"></Column>
+          <Column field="iseBaslamaTarihi" header="İşe Başlama" class="text-400"></Column>
+
           <Column header="İşlemler" :exportable="false" style="min-width:8rem">
             <template #body="slotProps">
               <div class="flex gap-2">
@@ -50,18 +46,30 @@
       content: { class: 'bg-gray-900 text-white pt-4' },
       footer: { class: 'bg-black' }
     }">
-      <div class="flex flex-column gap-4">
-        <div class="flex flex-column gap-2">
-          <label class="text-300 font-medium text-sm ml-1">Ad Soyad</label>
-          <InputText v-model="seciliPersonel.adSoyad" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
+      <div class="flex flex-column gap-3">
+        <div class="flex flex-column gap-1">
+          <label class="text-300 font-medium text-sm ml-1">Ad</label>
+          <InputText v-model="seciliPersonel.ad" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
-        <div class="flex flex-column gap-2">
+        <div class="flex flex-column gap-1">
+          <label class="text-300 font-medium text-sm ml-1">Soyad</label>
+          <InputText v-model="seciliPersonel.soyad" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
+        </div>
+        <div class="flex flex-column gap-1">
+          <label class="text-300 font-medium text-sm ml-1">E-Posta</label>
+          <InputText v-model="seciliPersonel.email" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
+        </div>
+        <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">Departman</label>
-          <InputText v-model="seciliPersonel.departman" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
+          <InputText v-model="seciliPersonel.departman" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
-        <div class="flex flex-column gap-2">
-          <label class="text-300 font-medium text-sm ml-1">Ünvan</label>
-          <InputText v-model="seciliPersonel.unvan" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
+        <div class="flex flex-column gap-1">
+          <label class="text-300 font-medium text-sm ml-1">Maaş</label>
+          <InputText v-model="seciliPersonel.maas" type="number" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
+        </div>
+        <div class="flex flex-column gap-1">
+          <label class="text-300 font-medium text-sm ml-1">İşe Başlama Tarihi</label>
+          <InputText v-model="seciliPersonel.iseBaslamaTarihi" placeholder="YYYY-MM-DD" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
       </div>
 
@@ -97,7 +105,7 @@ const seciliPersonel = ref({});
 const isEdit = ref(false);
 
 const openNewDialog = () => {
-  seciliPersonel.value = { adSoyad: '', departman: '', unvan: '', durum: 'Aktif' };
+  seciliPersonel.value = { ad: '', soyad: '', email: '', departman: '', maas: '', iseBaslamaTarihi: '' };
   dialogBaslik.value = 'Yeni Personel Kaydı';
   isEdit.value = false;
   dialogGoster.value = true;
@@ -111,7 +119,7 @@ const editPersonel = (personel) => {
 };
 
 const savePersonel = async () => {
-  if (seciliPersonel.value.adSoyad?.trim()) {
+  if (seciliPersonel.value.ad?.trim()) {
     if (isEdit.value) {
       await personelStore.updatePersonel(seciliPersonel.value.id, seciliPersonel.value);
     } else {

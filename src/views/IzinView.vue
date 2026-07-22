@@ -21,10 +21,8 @@
             </div>
           </template>
 
-          <Column field="personel" header="Personel" class="text-white font-bold"></Column>
-          <Column field="tur" header="İzin Türü" class="text-400"></Column>
-          <Column field="baslangic" header="Başlangıç" class="text-400"></Column>
-          <Column field="gun" header="Süre (Gün)" class="text-400"></Column>
+          <Column field="baslangicTarihi" header="Başlangıç Tarihi" class="text-400"></Column>
+          <Column field="bitisTarihi" header="Bitiş Tarihi" class="text-400"></Column>
           <Column field="durum" header="Durum">
             <template #body="slotProps">
               <span :class="['px-3 py-1 border-round-3xl text-xs font-bold uppercase tracking-wide', 
@@ -34,11 +32,12 @@
               </span>
             </template>
           </Column>
+          
           <Column header="İşlemler" :exportable="false" style="min-width:8rem">
             <template #body="slotProps">
               <div class="flex gap-2" v-if="slotProps.data.durum === 'Bekliyor'">
-                <Button icon="pi pi-check" class="p-button-rounded p-button-success p-button-outlined w-2rem h-2rem p-0" @click="updateDurum(slotProps.data, 'Onaylandı')" />
-                <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-outlined w-2rem h-2rem p-0" @click="updateDurum(slotProps.data, 'Reddedildi')" />
+                <Button icon="pi pi-check" class="p-button-rounded p-button-success p-button-outlined w-2rem h-2rem p-0" title="Onayla" @click="izinStore.updateIzinDurum(slotProps.data.id, 'onayla')" />
+                <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-outlined w-2rem h-2rem p-0" title="Reddet" @click="izinStore.updateIzinDurum(slotProps.data.id, 'reddet')" />
               </div>
             </template>
           </Column>
@@ -52,18 +51,14 @@
       content: { class: 'bg-gray-900 text-white pt-4' },
       footer: { class: 'bg-black' }
     }">
-      <div class="flex flex-column gap-4">
-        <div class="flex flex-column gap-2">
-          <label class="text-300 font-medium text-sm ml-1">Personel</label>
-          <InputText v-model="seciliIzin.personel" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" placeholder="Personel Adı" />
+      <div class="flex flex-column gap-3">
+        <div class="flex flex-column gap-1">
+          <label class="text-300 font-medium text-sm ml-1">Başlangıç Tarihi</label>
+          <InputText v-model="seciliIzin.baslangicTarihi" type="date" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
-        <div class="flex flex-column gap-2">
-          <label class="text-300 font-medium text-sm ml-1">İzin Türü</label>
-          <InputText v-model="seciliIzin.tur" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" placeholder="Örn: Yıllık İzin" />
-        </div>
-        <div class="flex flex-column gap-2">
-          <label class="text-300 font-medium text-sm ml-1">Süre (Gün)</label>
-          <InputText v-model="seciliIzin.gun" type="number" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
+        <div class="flex flex-column gap-1">
+          <label class="text-300 font-medium text-sm ml-1">Bitiş Tarihi</label>
+          <InputText v-model="seciliIzin.bitisTarihi" type="date" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
       </div>
 
@@ -97,19 +92,15 @@ const dialogGoster = ref(false);
 const seciliIzin = ref({});
 
 const openNewDialog = () => {
-  seciliIzin.value = { personel: '', tur: '', gun: 1, durum: 'Bekliyor', baslangic: 'Bugün' };
+  seciliIzin.value = { baslangicTarihi: '', bitisTarihi: '' };
   dialogGoster.value = true;
 };
 
 const saveIzin = async () => {
-  if (seciliIzin.value.personel && seciliIzin.value.tur) {
+  if (seciliIzin.value.baslangicTarihi && seciliIzin.value.bitisTarihi) {
     await izinStore.addIzin(seciliIzin.value);
     dialogGoster.value = false;
   }
-};
-
-const updateDurum = async (izin, yeniDurum) => {
-  await izinStore.updateIzinDurum(izin.id, { ...izin, durum: yeniDurum });
 };
 </script>
 

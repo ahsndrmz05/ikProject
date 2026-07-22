@@ -25,8 +25,9 @@
                 id="email" 
                 v-model="email" 
                 type="text" 
-                class="w-full bg-black border-gray-800 text-white border-round-2xl py-3 focus:border-accent-purple transition-colors" 
+                class="w-full bg-gray-900 border-gray-700 text-white border-round-2xl py-3 focus:border-accent-purple transition-colors" 
                 placeholder="admin@synchr.com" 
+                style="color: #ffffff !important; background-color: #000000 !important;"
               />
             </span>
           </div>
@@ -40,8 +41,9 @@
                 id="password" 
                 v-model="password" 
                 type="password" 
-                class="w-full bg-black border-gray-800 text-white border-round-2xl py-3 focus:border-accent-purple transition-colors" 
+                class="w-full bg-gray-900 border-gray-700 text-white border-round-2xl py-3 focus:border-accent-purple transition-colors" 
                 placeholder="••••••••" 
+                style="color: #ffffff !important; background-color: #000000 !important;"
                 @keyup.enter="handleLogin"
               />
             </span>

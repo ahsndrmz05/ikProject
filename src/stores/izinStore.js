@@ -27,15 +27,14 @@ export const useIzinStore = defineStore('izin', {
         throw error;
       }
     },
-    async updateIzinDurum(id, durumData) {
+    async updateIzinDurum(id, endpoint) {
       try {
-        const response = await api.put(`/Izin/${id}`, durumData);
-        const index = this.izinler.findIndex(i => i.id === id);
-        if (index !== -1) this.izinler[index] = response.data;
-      } catch (error) {
-        console.error('İzin güncelleme hatası:', error);
-        throw error;
-      }
+      const response = await api.put(`/Izin/${id}/${endpoint}`);
+      const index = this.izinler.findIndex(i => i.id === id);
+      if (index !== -1) this.izinler[index] = response.data;
+    } catch (error) {
+      console.error('İzin durum güncelleme hatası:', error);
+    }
     }
   }
 });

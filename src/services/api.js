@@ -3,7 +3,7 @@ import axios from 'axios';
 // Backend (C# .NET) çalıştığında genellikle localhost:5001 veya 7000 portlarını kullanır.
 // Arkadaşın backend'i ayağa kaldırdığında buradaki URL'yi güncelleyeceksin.
 const api = axios.create({
-  baseURL: 'https://localhost:5001/api', 
+  baseURL: 'http://localhost:5158/api', 
   timeout: 10000, // 10 saniyeden uzun sürerse zaman aşımı hatası ver
 });
 
