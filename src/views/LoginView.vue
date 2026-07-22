@@ -59,7 +59,7 @@
             label="Sisteme Giriş" 
             class="w-full p-3 font-bold border-round-2xl mt-2" 
             style="background-color: #a855f7; border: none; color: white;"
-            :loading="isLoading"
+            :loading="authStore.loading"
             @click="handleLogin" 
           />
         </div>
