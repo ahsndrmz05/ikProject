@@ -3,36 +3,42 @@ import api from '@/services/api';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null,
+    token: localStorage.getItem('token') || null,
     loading: false,
     error: null
   }),
   actions: {
-    async login(kullaniciAdi, sifre) {
+    async login(email, password) {
       this.loading = true;
       this.error = null;
       try {
-        // Backend'in beklediği DTO formatına göre (AuthDto.cs)
         const response = await api.post('/Auth/login', { 
-          email: kullaniciAdi, 
-          password: sifre 
+          email: email, 
+          password: password 
         });
         
-        // Backend'den gelen token'ı tarayıcıya kaydet
-        localStorage.setItem('token', response.data.token);
-        this.user = response.data.user;
+        // Backend'den gelen yanıtın formatına göre token'ı güvenle alıyoruz
+        const token = response.data.token || response.data; 
         
-        return true; // Giriş başarılı
-      } catch (error) {
-        this.error = 'E-posta veya şifre hatalı.';
-        return false; // Giriş başarısız
+        if (token) {
+          this.token = token;
+          localStorage.setItem('token', token);
+          return true;
+        } else {
+          this.error = 'Geçersiz sunucu yanıtı.';
+          return false;
+        }
+      } catch (err) {
+        console.error('Giriş hatası:', err);
+        this.error = err.response?.data?.message || 'E-posta veya şifre hatalı.';
+        return false;
       } finally {
         this.loading = false;
       }
     },
     logout() {
+      this.token = null;
       localStorage.removeItem('token');
-      this.user = null;
     }
   }
 });
