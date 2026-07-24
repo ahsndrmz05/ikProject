@@ -2,9 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import MainLayout from '../layouts/MainLayout.vue'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
-import PersonelView from '../views/PersonelView.vue'
-import IzinView from '../views/IzinView.vue'
-import DuyuruView from '../views/DuyuruView.vue'
+import PersonnelView from '../views/PersonnelView.vue'
+import LeaveView from '../views/LeaveView.vue'
+import AnnounceView from '../views/AnnounceView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,19 +26,19 @@ const router = createRouter({
           component: HomeView // / rotasına gidildiğinde MainLayout içinde bu açılır
         },
         {
-          path: 'personel',
-          name: 'personel',
-          component: PersonelView
+          path: 'personnel',
+          name: 'personnel',
+          component: PersonnelView
         },
       {
-          path: 'izinler',
-          name: 'izinler',
-          component: IzinView
+          path: 'leaves',
+          name: 'leaves',
+          component: LeaveView
         },
         {
-          path: 'duyurular',
-          name: 'duyurular',
-          component: DuyuruView
+          path: 'announcements',
+          name: 'announcements',
+          component: AnnounceView
         }
       ]
     }
@@ -51,5 +51,4 @@ router.beforeEach((to, from, next) => {
   else if (to.meta.requiresGuest && isAuthenticated) next({ name: 'dashboard' });
   else next();
 });
-
 export default router

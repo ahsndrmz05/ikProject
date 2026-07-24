@@ -10,31 +10,31 @@
 
     <Card class="bg-gray-900 border-none border-round-3xl shadow-4">
       <template #content>
-        <DataTable :value="duyuruStore.duyurular" :loading="duyuruStore.loading" responsiveLayout="scroll" :paginator="true" :rows="8" class="p-datatable-sm" :pt="{
+        <DataTable :value="announceStore.announcements" :loading="announceStore.loading" responsiveLayout="scroll" :paginator="true" :rows="8" class="p-datatable-sm" :pt="{
           root: { class: 'border-round-2xl overflow-hidden border-1 border-gray-800' },
           headerRow: { class: 'bg-black' }
         }">
           <template #empty>
             <div class="text-center p-4 text-400">
-              <span v-if="!duyuruStore.loading">Herhangi bir duyuru bulunamadı.</span>
+              <span v-if="!announceStore.loading">Herhangi bir duyuru bulunamadı.</span>
               <span v-else>Duyurular yükleniyor...</span>
             </div>
           </template>
 
-          <Column field="baslik" header="Duyuru Başlığı" class="text-white font-bold" style="width: 30%"></Column>
-          <Column field="icerik" header="İçerik Özeti" class="text-400" style="width: 40%">
+          <Column field="title" header="Duyuru Başlığı" class="text-white font-bold" style="width: 30%"></Column>
+          <Column field="content" header="İçerik Özeti" class="text-400" style="width: 40%">
             <template #body="slotProps">
               <span class="white-space-nowrap overflow-hidden text-overflow-ellipsis block" style="max-width: 300px;">
-                {{ slotProps.data.icerik }}
+                {{ slotProps.data.content }}
               </span>
             </template>
           </Column>
-          <Column field="tarih" header="Yayın Tarihi" class="text-400"></Column>
+          <Column field="date" header="Yayın Tarihi" class="text-400"></Column>
           <Column header="İşlemler" :exportable="false" style="min-width:8rem">
             <template #body="slotProps">
               <div class="flex gap-2">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info" @click="editDuyuru(slotProps.data)" />
-                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="deleteDuyuru(slotProps.data)" />
+                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info" @click="editAnnouncement(slotProps.data)" />
+                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="deleteAnnouncement(slotProps.data)" />
               </div>
             </template>
           </Column>
@@ -42,7 +42,7 @@
       </template>
     </Card>
 
-    <Dialog v-model:visible="dialogGoster" :header="dialogBaslik" :modal="true" class="p-fluid" :style="{ width: '550px' }" :pt="{
+    <Dialog v-model:visible="showDialog" :header="titleDialog" :modal="true" class="p-fluid" :style="{ width: '550px' }" :pt="{
       root: { class: 'border-round-3xl border-1 border-accent-purple bg-gray-900 overflow-hidden' },
       header: { class: 'bg-black text-white' },
       content: { class: 'bg-gray-900 text-white pt-4' },
@@ -51,18 +51,18 @@
       <div class="flex flex-column gap-4">
         <div class="flex flex-column gap-2">
           <label class="text-300 font-medium text-sm ml-1">Duyuru Başlığı</label>
-          <InputText v-model="seciliDuyuru.baslik" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
+          <InputText v-model="chosenAnnouncement.value.title" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
         </div>
         <div class="flex flex-column gap-2">
           <label class="text-300 font-medium text-sm ml-1">İçerik / Detaylar</label>
-          <Textarea v-model="seciliDuyuru.icerik" rows="5" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
+          <Textarea v-model="chosenAnnouncement.value.content" rows="5" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" />
         </div>
       </div>
 
       <template #footer>
         <div class="flex justify-content-end gap-2 mt-3">
-          <Button label="İptal" icon="pi pi-times" class="p-button-text p-button-secondary border-round-xl" @click="dialogGoster = false"/>
-          <Button label="Yayınla" icon="pi pi-check" class="p-button-help border-round-xl" @click="saveDuyuru" />
+          <Button label="İptal" icon="pi pi-times" class="p-button-text p-button-secondary border-round-xl" @click="showDialog = false"/>
+          <Button label="Yayınla" icon="pi pi-check" class="p-button-help border-round-xl" @click="saveAnnouncement" />
         </div>
       </template>
     </Dialog>
@@ -71,7 +71,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useDuyuruStore } from '@/stores/duyuruStore';
+import { useAnnounceStore } from '@/stores/announceStore';
 import Card from 'primevue/card';
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
@@ -80,45 +80,45 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 
-const duyuruStore = useDuyuruStore();
+const announceStore = useAnnounceStore();
 
 onMounted(() => {
-  duyuruStore.fetchDuyurular();
+  announceStore.fetchAnnouncements();
 });
 
-const dialogGoster = ref(false);
-const dialogBaslik = ref('');
-const seciliDuyuru = ref({});
+const showDialog = ref(false);
+const titleDialog = ref('');
+const chosenAnnouncement = ref({});
 const isEdit = ref(false);
 
 const openNewDialog = () => {
-  const tarihFormat = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date());
-  seciliDuyuru.value = { baslik: '', icerik: '', tarih: tarihFormat };
-  dialogBaslik.value = 'Yeni Duyuru Yayınla';
+  const dateFormat = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date());
+  chosenAnnouncement.value = { title: '', content: '', date: dateFormat };
+  titleDialog.value = 'Yeni Duyuru Yayınla';
   isEdit.value = false;
-  dialogGoster.value = true;
+  showDialog.value = true;
 };
 
-const editDuyuru = (duyuru) => {
-  seciliDuyuru.value = { ...duyuru }; 
-  dialogBaslik.value = 'Duyuruyu Düzenle';
+const editAnnouncement = (announcement) => {
+  chosenAnnouncement.value = { ...announcement }; 
+  titleDialog.value = 'Duyuruyu Düzenle';
   isEdit.value = true;
-  dialogGoster.value = true;
+  showDialog.value = true;
 };
 
-const saveDuyuru = async () => {
-  if (seciliDuyuru.value.baslik?.trim() && seciliDuyuru.value.icerik?.trim()) {
+const saveAnnouncement = async () => {
+  if (chosenAnnouncement.value.title?.trim() && chosenAnnouncement.value.content?.trim()) {
     if (isEdit.value) {
-      await duyuruStore.updateDuyuru(seciliDuyuru.value.id, seciliDuyuru.value);
+      await announceStore.updateAnnouncement(chosenAnnouncement.value.id, chosenAnnouncement.value);
     } else {
-      await duyuruStore.addDuyuru(seciliDuyuru.value);
+      await announceStore.addAnnouncement(chosenAnnouncement.value);
     }
-    dialogGoster.value = false;
+    showDialog.value = false;
   }
 };
 
-const deleteDuyuru = async (duyuru) => {
-  await duyuruStore.deleteDuyuru(duyuru.id);
+const deleteAnnouncement = async (announcement) => {
+  await announceStore.deleteAnnouncement(announcement.id);
 };
 </script>
 

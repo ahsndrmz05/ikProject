@@ -85,7 +85,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { usePersonelStore } from '@/stores/personelStore';
+import { usePersonnelStore } from '@/stores/personnelStore';
 import Card from 'primevue/card';
 import Button from 'primevue/button';
 import DataTable from 'primevue/datatable';
@@ -93,44 +93,44 @@ import Column from 'primevue/column';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 
-const personelStore = usePersonelStore();
+const personnelStore = usePersonnelStore();
 
 onMounted(() => {
-  personelStore.fetchPersoneller();
+  personnelStore.fetchPersonnels();
 });
 
-const dialogGoster = ref(false);
-const dialogBaslik = ref('');
-const seciliPersonel = ref({});
+const showDialog = ref(false);
+const titleDialog = ref('');
+const chosenPersonnel = ref({});
 const isEdit = ref(false);
 
 const openNewDialog = () => {
-  seciliPersonel.value = { ad: '', soyad: '', email: '', departman: '', maas: '', iseBaslamaTarihi: '' };
-  dialogBaslik.value = 'Yeni Personel Kaydı';
+  chosenPersonnel.value = { ad: '', soyad: '', email: '', departman: '', maas: '', iseBaslamaTarihi: '' };
+  titleDialog.value = 'Yeni Personel Kaydı';
   isEdit.value = false;
-  dialogGoster.value = true;
+  showDialog.value = true;
 };
 
-const editPersonel = (personel) => {
-  seciliPersonel.value = { ...personel }; 
-  dialogBaslik.value = 'Personel Bilgilerini Düzenle';
+const editPersonnel = (personnel) => {
+  chosenPersonnel.value = { ...personnel }; 
+  titleDialog.value = 'Personel Bilgilerini Düzenle';
   isEdit.value = true;
-  dialogGoster.value = true;
+  showDialog.value = true;
 };
 
-const savePersonel = async () => {
-  if (seciliPersonel.value.ad?.trim()) {
+const savePersonnel = async () => {
+  if (chosenPersonnel.value.ad?.trim()) {
     if (isEdit.value) {
-      await personelStore.updatePersonel(seciliPersonel.value.id, seciliPersonel.value);
+      await personnelStore.updatePersonnel(chosenPersonnel.value.id, chosenPersonnel.value);
     } else {
-      await personelStore.addPersonel(seciliPersonel.value);
+      await personnelStore.addPersonnel(chosenPersonnel.value);
     }
-    dialogGoster.value = false;
+    showDialog.value = false;
   }
 };
 
-const deletePersonel = async (personel) => {
-  await personelStore.deletePersonel(personel.id);
+const deletePersonnel = async (personnel) => {
+  await personnelStore.deletePersonnel(personnel.id);
 };
 </script>
 
