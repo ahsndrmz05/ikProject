@@ -1,40 +1,50 @@
 import { defineStore } from 'pinia';
 import api from '@/services/api';
 
-export const useIzinStore = defineStore('izin', {
+export const useLeaveStore = defineStore('leave', {
   state: () => ({
-    izinler: [],
-    loading: false
+    leaves: [],
+    loading: false,
+    error: null
   }),
   actions: {
-    async fetchIzinler() {
+    async fetchLeaves() {
       this.loading = true;
       try {
-        const response = await api.get('/Izin');
-        this.izinler = response.data;
-      } catch (error) {
-        console.error('İzinler yüklenemedi:', error);
+        const response = await api.get('/Leave/getLeaves');
+        this.leaves = response.data;
+      } catch (err) {
+        console.error('İzinler yüklenirken hata:', err);
+        this.error = err.message;
       } finally {
         this.loading = false;
       }
     },
-    async addIzin(yeniIzin) {
+    async addLeave(leaveData) {
       try {
-        const response = await api.post('/Izin', yeniIzin);
-        this.izinler.unshift(response.data);
-      } catch (error) {
-        console.error('İzin ekleme hatası:', error);
-        throw error;
+        const response = await api.post('/Leave/createLeave', leaveData);
+        this.leaves.push(response.data);
+      } catch (err) {
+        console.error('İzin ekleme hatası:', err);
       }
     },
-    async updateIzinDurum(id, endpoint) {
+    async updateLeaveStatus(id, statusType) {
       try {
-      const response = await api.put(`/Izin/${id}/${endpoint}`);
-      const index = this.izinler.findIndex(i => i.id === id);
-      if (index !== -1) this.izinler[index] = response.data;
-    } catch (error) {
-      console.error('İzin durum güncelleme hatası:', error);
-    }
+        let endpoint = '';
+        if (statusType === 'approve') {
+          endpoint = `/Leave/approveLeave/${id}`;
+        } else if (statusType === 'reject') {
+          endpoint = `/Leave/rejectLeave/${id}`;
+        }
+        
+        const response = await api.put(endpoint);
+        const index = this.leaves.findIndex(l => l.id === id);
+        if (index !== -1) {
+          this.leaves[index] = response.data;
+        }
+      } catch (err) {
+        console.error('İzin durum güncelleme hatası:', err);
+      }
     }
   }
 });
