@@ -4,6 +4,8 @@ import api from '@/services/api';
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('token') || null,
+    userRole: localStorage.getItem('userRole') || null,
+    userEmail: localStorage.getItem('userEmail') || null,
     loading: false,
     error: null
   }),
@@ -17,12 +19,17 @@ export const useAuthStore = defineStore('auth', {
           password: password 
         });
         
-        // Backend'den gelen yanıtın formatına göre token'ı güvenle alıyoruz
-        const token = response.data.token || response.data; 
+        const token = response.data.token;
+        const user = response.data.user;
         
         if (token) {
           this.token = token;
+          this.userRole = user?.rol || 'Calisan';
+          this.userEmail = user?.email || email;
+
           localStorage.setItem('token', token);
+          localStorage.setItem('userRole', this.userRole);
+          localStorage.setItem('userEmail', this.userEmail);
           return true;
         } else {
           this.error = 'Geçersiz sunucu yanıtı.';
@@ -38,7 +45,11 @@ export const useAuthStore = defineStore('auth', {
     },
     logout() {
       this.token = null;
+      this.userRole = null;
+      this.userEmail = null;
       localStorage.removeItem('token');
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('userEmail');
     }
   }
 });
