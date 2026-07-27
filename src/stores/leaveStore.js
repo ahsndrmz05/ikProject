@@ -8,10 +8,12 @@ export const useLeaveStore = defineStore('leave', {
     error: null
   }),
   actions: {
-    async fetchLeaves() {
+    async fetchLeaves(userRole) {
       this.loading = true;
       try {
-        const response = await api.get('/Leave/getLeaves');
+        // Eğer kullanıcı Çalışan ise sadece kendi izinlerini, yönetici ise tüm izinleri getirir
+        const endpoint = userRole === 'Calisan' ? '/Leave/getMyLeaves' : '/Leave/getLeaves';
+        const response = await api.get(endpoint);
         this.leaves = response.data;
       } catch (err) {
         console.error('İzinler yüklenirken hata:', err);
@@ -26,6 +28,7 @@ export const useLeaveStore = defineStore('leave', {
         this.leaves.push(response.data);
       } catch (err) {
         console.error('İzin ekleme hatası:', err);
+        throw err;
       }
     },
     async updateLeaveStatus(id, statusType) {
@@ -44,6 +47,7 @@ export const useLeaveStore = defineStore('leave', {
         }
       } catch (err) {
         console.error('İzin durum güncelleme hatası:', err);
+        throw err;
       }
     }
   }

@@ -4,9 +4,10 @@
     <header class="flex justify-content-between align-items-center mb-2">
       <div>
         <h1 class="text-3xl font-bold text-white m-0">İzin Talepleri</h1>
-        <span class="text-400 text-sm mt-1 block">Tüm izin taleplerini yönetin veya yeni bir izin talebi oluşturun.</span>
+        <span class="text-400 text-sm mt-1 block">
+          {{ authStore.userRole === 'Calisan' ? 'Kendi izin taleplerinizi görüntüleyin ve yeni talep oluşturun.' : 'Tüm personel izin taleplerini yönetin.' }}
+        </span>
       </div>
-      <!-- Sadece Çalışan Rolü İzin Talebi Açabilir -->
       <Button 
         v-if="authStore.userRole === 'Calisan'" 
         label="Yeni İzin Talebi" 
@@ -41,7 +42,6 @@
             </template>
           </Column>
           
-          <!-- Onay/Red Butonları Sadece Yöneticilere Görünür -->
           <Column header="İşlemler" :exportable="false" style="min-width:8rem" v-if="authStore.userRole !== 'Calisan'">
             <template #body="slotProps">
               <div class="flex gap-2" v-if="slotProps.data.durum === 'Bekliyor' || slotProps.data.durum === 'Beklemede'">
@@ -99,7 +99,7 @@ const authStore = useAuthStore();
 const toast = useToast();
 
 onMounted(() => {
-  leaveStore.fetchLeaves();
+  leaveStore.fetchLeaves(authStore.userRole);
 });
 
 const dialogGoster = ref(false);
@@ -120,6 +120,7 @@ const saveIzin = async () => {
     await leaveStore.addLeave(seciliIzin.value);
     dialogGoster.value = false;
     toast.add({ severity: 'success', summary: 'Başarılı', detail: 'İzin talebi başarıyla oluşturuldu.', life: 3000 });
+    leaveStore.fetchLeaves(authStore.userRole);
   } catch (err) {
     toast.add({ severity: 'error', summary: 'Hata', detail: err.response?.data?.message || 'İzin talebi oluşturulamadı.', life: 3000 });
   }
@@ -143,10 +144,3 @@ const handleReject = async (id) => {
   }
 };
 </script>
-
-<style scoped>
-:deep(.p-datatable .p-datatable-thead > tr > th) { background-color: #050505 !important; color: #a855f7 !important; border-bottom: 1px solid #1f1f1f; padding: 1rem; }
-:deep(.p-datatable .p-datatable-tbody > tr) { background-color: #0a0a0a !important; transition: background-color 0.2s; }
-:deep(.p-datatable .p-datatable-tbody > tr:hover) { background-color: #141414 !important; }
-:deep(.p-datatable .p-datatable-tbody > tr > td) { border-bottom: 1px solid #1f1f1f; padding: 1rem; }
-</style>
