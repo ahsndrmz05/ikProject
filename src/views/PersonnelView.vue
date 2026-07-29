@@ -10,13 +10,13 @@
 
     <Card class="bg-gray-900 border-none border-round-3xl shadow-4">
       <template #content>
-        <DataTable :value="personelStore.personeller" :loading="personelStore.loading" responsiveLayout="scroll" :paginator="true" :rows="8" class="p-datatable-sm" :pt="{
+        <DataTable :value="personnelStore.personnels" :loading="personnelStore.loading" responsiveLayout="scroll" :paginator="true" :rows="8" class="p-datatable-sm" :pt="{
           root: { class: 'border-round-2xl overflow-hidden border-1 border-gray-800' },
           headerRow: { class: 'bg-black' }
         }">
           <template #empty>
             <div class="text-center p-4 text-400">
-              <span v-if="!personelStore.loading">Herhangi bir personel kaydı bulunamadı.</span>
+              <span v-if="!personnelStore.loading">Herhangi bir personel kaydı bulunamadı.</span>
               <span v-else>Personel verileri yükleniyor...</span>
             </div>
           </template>
@@ -31,8 +31,8 @@
           <Column header="İşlemler" :exportable="false" style="min-width:8rem">
             <template #body="slotProps">
               <div class="flex gap-2">
-                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info" @click="editPersonel(slotProps.data)" />
-                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="deletePersonel(slotProps.data)" />
+                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-info" @click="editPersonnel(slotProps.data)" />
+                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="deletePersonnel(slotProps.data)" />
               </div>
             </template>
           </Column>
@@ -40,7 +40,7 @@
       </template>
     </Card>
 
-    <Dialog v-model:visible="dialogGoster" :header="dialogBaslik" :modal="true" class="p-fluid" :style="{ width: '450px' }" :pt="{
+    <Dialog v-model:visible="showDialog" :header="titleDialog" :modal="true" class="p-fluid" :style="{ width: '450px' }" :pt="{
       root: { class: 'border-round-3xl border-1 border-accent-purple bg-gray-900 overflow-hidden' },
       header: { class: 'bg-black text-white' },
       content: { class: 'bg-gray-900 text-white pt-4' },
@@ -49,34 +49,34 @@
       <div class="flex flex-column gap-3">
         <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">Ad</label>
-          <InputText v-model="seciliPersonel.ad" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
+          <InputText v-model="chosenPersonnel.ad" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
         <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">Soyad</label>
-          <InputText v-model="seciliPersonel.soyad" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
+          <InputText v-model="chosenPersonnel.soyad" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
         <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">E-Posta</label>
-          <InputText v-model="seciliPersonel.email" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
+          <InputText v-model="chosenPersonnel.email" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
         <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">Departman</label>
-          <InputText v-model="seciliPersonel.departman" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
+          <InputText v-model="chosenPersonnel.departman" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
         <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">Maaş</label>
-          <InputText v-model="seciliPersonel.maas" type="number" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
+          <InputText v-model="chosenPersonnel.maas" type="number" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
         <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">İşe Başlama Tarihi</label>
-          <InputText v-model="seciliPersonel.iseBaslamaTarihi" placeholder="YYYY-MM-DD" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
+          <InputText v-model="chosenPersonnel.iseBaslamaTarihi" type="date" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
         </div>
       </div>
 
       <template #footer>
         <div class="flex justify-content-end gap-2 mt-3">
-          <Button label="İptal" icon="pi pi-times" class="p-button-text p-button-secondary border-round-xl" @click="dialogGoster = false"/>
-          <Button label="Kaydet" icon="pi pi-check" class="p-button-help border-round-xl" @click="savePersonel" />
+          <Button label="İptal" icon="pi pi-times" class="p-button-text p-button-secondary border-round-xl" @click="showDialog = false"/>
+          <Button label="Kaydet" icon="pi pi-check" class="p-button-help border-round-xl" @click="savePersonnel" />
         </div>
       </template>
     </Dialog>
@@ -119,13 +119,26 @@ const editPersonnel = (personnel) => {
 };
 
 const savePersonnel = async () => {
-  if (chosenPersonnel.value.ad?.trim()) {
+  if (!chosenPersonnel.value.ad?.trim()) {
+    alert('Lütfen ad alanını doldurun.');
+    return;
+  }
+
+  const tarih = chosenPersonnel.value.iseBaslamaTarihi;
+  if (!tarih || isNaN(Date.parse(tarih))) {
+    alert('Lütfen geçerli bir işe başlama tarihi girin.');
+    return;
+  }
+
+  try {
     if (isEdit.value) {
       await personnelStore.updatePersonnel(chosenPersonnel.value.id, chosenPersonnel.value);
     } else {
       await personnelStore.addPersonnel(chosenPersonnel.value);
     }
     showDialog.value = false;
+  } catch (err) {
+    alert('Kayıt işlemi başarısız oldu. Bilgileri kontrol edin.');
   }
 };
 
