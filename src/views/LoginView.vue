@@ -76,11 +76,14 @@ const password = ref('');
 
 const handleLogin = async () => {
   if (!email.value || !password.value) return;
+  const result = await authStore.login(email.value, password.value);
   
-  const basarili = await authStore.login(email.value, password.value);
-  
-  if (basarili) {
-    router.push({ name: 'dashboard' });
+  if (result.success) {
+    if (result.isFirstLogin) {
+      router.push('/profile'); // Veya şifre değiştirme modalı/ekranı
+    } else {
+      router.push('/');
+    }
   }
 };
 </script>
