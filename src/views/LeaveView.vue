@@ -4,7 +4,7 @@
     <header class="flex justify-content-between align-items-center mb-2">
       <div>
         <h1 class="text-3xl font-bold text-white m-0">İzin Talepleri</h1>
-        <span class="text-400 text-sm mt-1 block">İzin taleplerinizi yönetin ve takip edin.</span>
+        <span class="text-400 text-sm mt-1 block">İzin taleplerinizi oluşturun ve yönetin.</span>
       </div>
       <Button 
         v-if="authStore.userRole === 'Calisan'" 
@@ -17,9 +17,12 @@
 
     <Card class="bg-gray-900 border-none border-round-3xl shadow-4">
       <template #content>
-        <DataTable :value="leaveStore.leaves" :loading="leaveStore.loading" responsiveLayout="scroll" :paginator="true" :rows="8" class="p-datatable-sm">
+        <DataTable :value="leaveStore.leaves" :loading="leaveStore.loading" responsiveLayout="scroll" :paginator="true" :rows="8" class="p-datatable-sm" :pt="{
+          root: { class: 'border-round-2xl overflow-hidden border-1 border-gray-800' },
+          headerRow: { class: 'bg-black' }
+        }">
           <template #empty>
-            <div class="text-center p-4 text-400">İzin talebi bulunamadı.</div>
+            <div class="text-center p-4 text-400">Herhangi bir izin talebi bulunamadı.</div>
           </template>
 
           <Column field="turu" header="İzin Türü" class="text-400"></Column>
@@ -32,7 +35,7 @@
           </Column>
           <Column field="durum" header="Durum">
             <template #body="slotProps">
-              <span :class="['px-3 py-1 border-round-3xl text-xs font-bold uppercase', 
+              <span :class="['px-3 py-1 border-round-3xl text-xs font-bold uppercase tracking-wide', 
                 slotProps.data.durum === 'Onaylandi' || slotProps.data.durum === 'Onaylandı' ? 'bg-green-900 text-green-400' : 
                 slotProps.data.durum === 'Beklemede' || slotProps.data.durum === 'Bekliyor' ? 'bg-orange-900 text-orange-400' : 'bg-red-900 text-red-400']">
                 {{ slotProps.data.durum }}
@@ -42,8 +45,8 @@
           <Column header="İşlemler" v-if="authStore.userRole !== 'Calisan'">
             <template #body="slotProps">
               <div class="flex gap-2" v-if="slotProps.data.durum === 'Beklemede' || slotProps.data.durum === 'Bekliyor'">
-                <Button icon="pi pi-check" class="p-button-rounded p-button-success p-button-outlined" @click="handleApprove(slotProps.data.id)" />
-                <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-outlined" @click="handleReject(slotProps.data.id)" />
+                <Button icon="pi pi-check" class="p-button-rounded p-button-success p-button-outlined w-2rem h-2rem p-0" @click="handleApprove(slotProps.data.id)" />
+                <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-outlined w-2rem h-2rem p-0" @click="handleReject(slotProps.data.id)" />
               </div>
             </template>
           </Column>
@@ -51,34 +54,39 @@
       </template>
     </Card>
 
-    <!-- Dialog -->
-    <Dialog v-model:visible="dialogGoster" header="Yeni İzin Talebi Oluştur" :modal="true" class="p-fluid" :style="{ width: '450px' }">
-      <div class="flex flex-column gap-3 pt-3">
+    <!-- Yeni İzin Modalı -->
+    <Dialog v-model:visible="dialogGoster" header="Yeni İzin Talebi Oluştur" :modal="true" class="p-fluid" :style="{ width: '450px' }" :pt="{
+      root: { class: 'border-round-3xl border-1 border-accent-purple bg-gray-900 overflow-hidden' },
+      header: { class: 'bg-black text-white' },
+      content: { class: 'bg-gray-900 text-white pt-4' },
+      footer: { class: 'bg-black' }
+    }">
+      <div class="flex flex-column gap-3">
         <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">İzin Türü</label>
-          <Dropdown v-model="seciliIzin.turu" :options="izinTurleri" optionLabel="label" optionValue="value" placeholder="İzin türü seçiniz" class="bg-black border-gray-800 text-white" />
+          <Dropdown v-model="seciliIzin.turu" :options="izinTurleri" optionLabel="label" optionValue="value" placeholder="İzin türü seçiniz" class="bg-black border-gray-800 text-white border-round-xl" />
         </div>
 
         <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">Başlangıç Tarihi</label>
-          <InputText v-model="seciliIzin.baslangicTarihi" type="date" class="bg-black border-gray-800 text-white p-3" />
+          <InputText v-model="seciliIzin.baslangicTarihi" type="date" class="bg-black border-gray-800 text-white border-round-xl p-3" style="color: #fff !important;" />
         </div>
 
         <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">Bitiş Tarihi</label>
-          <InputText v-model="seciliIzin.bitisTarihi" type="date" class="bg-black border-gray-800 text-white p-3" />
+          <InputText v-model="seciliIzin.bitisTarihi" type="date" class="bg-black border-gray-800 text-white border-round-xl p-3" style="color: #fff !important;" />
         </div>
 
         <div class="flex flex-column gap-1">
-          <label class="text-300 font-medium text-sm ml-1">Yerine Bakacak Personel (Opsiyonel)</label>
-          <Dropdown v-model="seciliIzin.substituteId" :options="adaylar" optionLabel="adSoyad" optionValue="id" placeholder="Yerine bakacak kişiyi seçiniz" class="bg-black border-gray-800 text-white" showClear />
+          <label class="text-300 font-medium text-sm ml-1">Yerine Bakacak Kişi (Opsiyonel)</label>
+          <Dropdown v-model="seciliIzin.substituteId" :options="adaylar" optionLabel="adSoyad" optionValue="id" placeholder="Yerine bakacak kişiyi seçiniz" class="bg-black border-gray-800 text-white border-round-xl" showClear />
         </div>
       </div>
 
       <template #footer>
         <div class="flex justify-content-end gap-2 mt-3">
-          <Button label="İptal" icon="pi pi-times" class="p-button-text p-button-secondary" @click="dialogGoster = false"/>
-          <Button label="Talebi Gönder" icon="pi pi-send" class="p-button-help" @click="saveIzin" />
+          <Button label="İptal" icon="pi pi-times" class="p-button-text p-button-secondary border-round-xl" @click="dialogGoster = false"/>
+          <Button label="Talebi Gönder" icon="pi pi-send" class="p-button-help border-round-xl" @click="saveIzin" />
         </div>
       </template>
     </Dialog>
@@ -111,10 +119,10 @@ onMounted(async () => {
   leaveStore.fetchLeaves(authStore.userRole);
   if (authStore.userRole === 'Calisan') {
     try {
-      const response = await api.get('/Leave/getSubstituteCandidates');
-      adaylar.value = response.data;
+      const cevap = await api.get('/Leave/getSubstituteCandidates');
+      adaylar.value = cevap.data;
     } catch (err) {
-      console.error('Yedek personel listesi alınamadı:', err);
+      console.error('Aday listesi alınamadı:', err);
     }
   }
 });
