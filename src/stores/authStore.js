@@ -6,40 +6,48 @@ export const useAuthStore = defineStore('auth', {
     token: localStorage.getItem('token') || null,
     userRole: localStorage.getItem('userRole') || null,
     userEmail: localStorage.getItem('userEmail') || null,
-    isFirstLogin: false,
+    isFirstLogin: localStorage.getItem('isFirstLogin') === 'true',
     loading: false,
     error: null
   }),
   actions: {
+    setUser(data) {
+      if (data && data.token) {
+        this.token = data.token;
+        this.userRole = data.user?.rol || 'Calisan';
+        this.userEmail = data.user?.email || '';
+        this.isFirstLogin = data.user?.isFirstLogin || false;
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userRole', this.userRole);
+        localStorage.setItem('userEmail', this.userEmail);
+        localStorage.setItem('isFirstLogin', this.isFirstLogin);
+      }
+    },
     async login(email, password) {
       this.loading = true;
       this.error = null;
       try {
         const response = await api.post('/Auth/login', { email, password });
-        const { token, user } = response.data;
-        
-        if (token) {
-          this.token = token;
-          this.userRole = user.rol;
-          this.userEmail = user.email;
-          this.isFirstLogin = user.isFirstLogin || false;
-
-          localStorage.setItem('token', token);
-          localStorage.setItem('userRole', user.rol);
-          localStorage.setItem('userEmail', user.email);
-          return { success: true, isFirstLogin: this.isFirstLogin };
-        }
-        return { success: false };
+        this.setUser(response.data);
+        return response.data;
       } catch (err) {
         if (err.response?.status === 401) {
           this.error = typeof err.response?.data === 'string' ? err.response.data : 'Bu hesap aktif değil veya bilgiler hatalı.';
         } else {
           this.error = err.response?.data || 'Giriş yapılamadı.';
         }
-        return { success: false };
+        throw err;
       } finally {
         this.loading = false;
       }
+    },
+    logout() {
+      this.token = null;
+      this.userRole = null;
+      this.userEmail = null;
+      this.isFirstLogin = false;
+      localStorage.clear();
     }
   }
 });
