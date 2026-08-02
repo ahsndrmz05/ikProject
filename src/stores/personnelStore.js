@@ -4,13 +4,13 @@ import api from '@/services/api';
 export const usePersonnelStore = defineStore('personnel', {
   state: () => ({
     personnels: [],
-    selectedDepartment: 'Tümü',
+    selectedDepartment: 'All',
     loading: false,
     error: null
   }),
   getters: {
     filteredPersonnels(state) {
-      if (!state.selectedDepartment || state.selectedDepartment === 'Tümü') {
+      if (!state.selectedDepartment || state.selectedDepartment === 'All') {
         return state.personnels;
       }
       return state.personnels.filter(p => p.departman === state.selectedDepartment);
@@ -23,7 +23,7 @@ export const usePersonnelStore = defineStore('personnel', {
         const response = await api.get('/Personnel/getPersonnel');
         this.personnels = response.data;
       } catch (err) {
-        console.error('Personeller yüklenirken hata:', err);
+        console.error('Error fetching personnel:', err);
         this.error = err.message;
       } finally {
         this.loading = false;
@@ -34,7 +34,7 @@ export const usePersonnelStore = defineStore('personnel', {
         const response = await api.post('/Personnel/addPersonnel', personnelData);
         this.personnels.push(response.data);
       } catch (err) {
-        console.error('Personel ekleme hatası:', err);
+        console.error('Error adding personnel:', err);
         throw err;
       }
     },
@@ -46,7 +46,7 @@ export const usePersonnelStore = defineStore('personnel', {
           this.personnels[index] = response.data;
         }
       } catch (err) {
-        console.error('Personel güncelleme hatası:', err);
+        console.error('Error updating personnel:', err);
         throw err;
       }
     },
@@ -55,7 +55,7 @@ export const usePersonnelStore = defineStore('personnel', {
         await api.delete(`/Personnel/deletePersonnel/${id}`);
         this.personnels = this.personnels.filter(p => p.id !== id);
       } catch (err) {
-        console.error('Personel silme hatası:', err);
+        console.error('Error deleting personnel:', err);
       }
     }
   }
