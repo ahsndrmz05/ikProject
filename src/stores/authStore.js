@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', {
     token: localStorage.getItem('token') || null,
     userRole: localStorage.getItem('userRole') || null,
     userEmail: localStorage.getItem('userEmail') || null,
+    isFirstLogin: false,
     loading: false,
     error: null
   }),
@@ -14,42 +15,31 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true;
       this.error = null;
       try {
-        const response = await api.post('/Auth/login', { 
-          email: email, 
-          password: password 
-        });
-        
-        const token = response.data.token;
-        const user = response.data.user;
+        const response = await api.post('/Auth/login', { email, password });
+        const { token, user } = response.data;
         
         if (token) {
           this.token = token;
-          this.userRole = user?.rol || 'Calisan';
-          this.userEmail = user?.email || email;
+          this.userRole = user.rol;
+          this.userEmail = user.email;
+          this.isFirstLogin = user.isFirstLogin || false;
 
           localStorage.setItem('token', token);
-          localStorage.setItem('userRole', this.userRole);
-          localStorage.setItem('userEmail', this.userEmail);
-          return true;
-        } else {
-          this.error = 'Geçersiz sunucu yanıtı.';
-          return false;
+          localStorage.setItem('userRole', user.rol);
+          localStorage.setItem('userEmail', user.email);
+          return { success: true, isFirstLogin: this.isFirstLogin };
         }
+        return { success: false };
       } catch (err) {
-        console.error('Giriş hatası:', err);
-        this.error = err.response?.data?.message || 'E-posta veya şifre hatalı.';
-        return false;
+        if (err.response?.status === 401) {
+          this.error = typeof err.response?.data === 'string' ? err.response.data : 'Bu hesap aktif değil veya bilgiler hatalı.';
+        } else {
+          this.error = err.response?.data || 'Giriş yapılamadı.';
+        }
+        return { success: false };
       } finally {
         this.loading = false;
       }
-    },
-    logout() {
-      this.token = null;
-      this.userRole = null;
-      this.userEmail = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('userEmail');
     }
   }
 });
