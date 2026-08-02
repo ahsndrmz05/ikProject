@@ -69,8 +69,7 @@
         </div>
         <div class="flex flex-column gap-1">
           <label class="text-300 font-medium text-sm ml-1">İşe Başlama Tarihi</label>
-          <InputText v-model="seciliPersonel.iseBaslamaTarihi" placeholder="YYYY-MM-DD" class="bg-black border-gray-800 text-white focus:border-accent-purple border-round-xl p-3" style="color: #fff !important;" />
-        </div>
+          <InputText v-model="seciliPersonel.iseBaslamaTarihi" type="date" class="w-full bg-black border-gray-800 text-white border-round-xl p-3" />        </div>
       </div>
 
       <template #footer>
