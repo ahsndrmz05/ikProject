@@ -2,11 +2,11 @@
   <div class="flex flex-column gap-5">
     <div class="flex justify-content-between align-items-center bg-gray-900 p-4 border-round-3xl shadow-4">
       <div>
-        <h1 class="text-3xl font-bold text-white m-0">Hoş Geldiniz, <span class="text-purple-400">{{ authStore.userEmail }}</span></h1>
-        <span class="text-400 text-sm mt-1 block">İK yönetim platformu kontrol paneli.</span>
+        <h1 class="text-3xl font-bold text-white m-0">Welcome, <span class="text-purple-400">{{ authStore.userEmail }}</span></h1>
+        <span class="text-400 text-sm mt-1 block">HR management platform dashboard.</span>
       </div>
       <div class="bg-black px-4 py-2 border-round-2xl border-1 border-gray-800 text-purple-400 font-bold text-sm">
-        Rol: {{ authStore.userRole }}
+        Role: {{ authStore.userRole }}
       </div>
     </div>
 
@@ -18,8 +18,8 @@
             <i class="pi pi-clock"></i>
           </div>
           <div class="flex flex-column">
-            <span class="text-400 text-sm font-medium">Kalan İzin Hakkı</span>
-            <span class="text-2xl font-bold text-white mt-1">14 Gün</span>
+            <span class="text-400 text-sm font-medium">Remaining Leave</span>
+            <span class="text-2xl font-bold text-white mt-1">14 Days</span>
           </div>
         </div>
       </div>
@@ -30,7 +30,7 @@
             <i class="pi pi-users"></i>
           </div>
           <div class="flex flex-column">
-            <span class="text-400 text-sm font-medium">Toplam Personel</span>
+            <span class="text-400 text-sm font-medium">Total Personnel</span>
             <span class="text-2xl font-bold text-white mt-1">{{ personnelStore.personnels.length }}</span>
           </div>
         </div>
@@ -42,22 +42,22 @@
             <i class="pi pi-calendar"></i>
           </div>
           <div class="flex flex-column">
-            <span class="text-400 text-sm font-medium">İzin Talepleri</span>
+            <span class="text-400 text-sm font-medium">Leave Requests</span>
             <span class="text-2xl font-bold text-white mt-1">{{ leaveStore.leaves.length }}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Kişiye Zimmetli Eşyalar Listesi (Çalışan Görür, İK Düzenler) -->
+    <!-- Zimmetli Eşyalar Listesi (Çalışan Görür, İK Düzenler) -->
     <div class="bg-gray-900 p-4 border-round-3xl border-1 border-gray-800 flex flex-column gap-3 shadow-4">
       <div class="flex justify-content-between align-items-center">
-        <h3 class="text-white text-lg font-bold m-0">Zimmetli Eşyalar ve Ekipmanlar</h3>
-        <Button v-if="authStore.userRole !== 'Calisan'" label="Eşya Zimmetle" icon="pi pi-plus" class="p-button-sm p-button-help border-round-xl" @click="addItem" />
+        <h3 class="text-white text-lg font-bold m-0">Assigned Equipment & Assets</h3>
+        <Button v-if="authStore.userRole !== 'Calisan'" label="Assign Asset" icon="pi pi-plus" class="p-button-sm p-button-help border-round-xl" @click="addItem" />
       </div>
       <ul class="list-none p-0 m-0 flex flex-column gap-2">
         <li v-for="item in assignedItems" :key="item.id" class="flex justify-content-between align-items-center bg-black p-3 border-round-xl border-1 border-gray-800 text-300">
-          <span class="text-white font-medium">{{ item.name }} (Seri No: {{ item.serial }})</span>
+          <span class="text-white font-medium">{{ item.name }} (Serial No: {{ item.serial }})</span>
           <Button v-if="authStore.userRole !== 'Calisan'" icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-0 w-2rem h-2rem" @click="removeItem(item.id)" />
         </li>
       </ul>
@@ -78,12 +78,12 @@ const leaveStore = useLeaveStore();
 
 const assignedItems = ref([
   { id: 1, name: 'Dell Latitude Laptop', serial: 'DL-99823' },
-  { id: 2, name: 'Logitech Kablosuz Mouse', serial: 'LG-44120' }
+  { id: 2, name: 'Logitech Wireless Mouse', serial: 'LG-44120' }
 ]);
 
 const addItem = () => {
-  const name = prompt('Cihaz Adı:');
-  const serial = prompt('Seri Numarası:');
+  const name = prompt('Device Name:');
+  const serial = prompt('Serial Number:');
   if (name && serial) {
     assignedItems.value.push({ id: Date.now(), name, serial });
   }
