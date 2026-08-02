@@ -7,6 +7,7 @@ import router from './router'
 // PrimeVue ve Yeni Tema Sistemi
 import PrimeVue from 'primevue/config'
 import Lara from '@primevue/themes/lara'
+import ToastService from 'primevue/toastservice'
 
 import 'primeicons/primeicons.css'                            // İkonlar
 import 'primeflex/primeflex.css'                              // Grid ve Utility sınıfları
@@ -27,5 +28,7 @@ app.use(PrimeVue, {
         }
     }
 })
+
+app.use(ToastService)
 
 app.mount('#app')
