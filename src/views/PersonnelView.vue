@@ -147,7 +147,7 @@ const personnelForm = ref({ experiences: [] });
 const openNewDialog = () => {
   isEditing.value = false;
   allowDateEdit.value = true;
-  personnelForm.value = { ad: '', soyad: '', email: '', departman: '', maas: '', iseBaslamaTarihi: '', experiences: [] };
+  personnelForm.value = { ...emptyPersonnel };
   dialogGoster.value = true;
 };
 
@@ -181,5 +181,35 @@ const savePersonnel = async () => {
 const deletePersonnel = async (id) => {
   await personnelStore.deletePersonnel(id);
   toast.add({ severity: 'info', summary: 'Deleted', detail: 'Personnel record removed.', life: 3000 });
+};
+
+const unvanOptions = [
+  { label: 'Stajyer', value: 'Stajyer' },
+  { label: 'Asistan', value: 'Asistan' },
+  { label: 'Uzman', value: 'Uzman' },
+  { label: 'Kıdemli Uzman', value: 'KidemliUzman' },
+  { label: 'Takım Lideri', value: 'TakimLideri' },
+  { label: 'Mühendis', value: 'Muhendis' },
+  { label: 'Kıdemli Mühendis', value: 'KidemliMuhendis' },
+  { label: 'Yönetici', value: 'Yonetici' },
+  { label: 'Müdür', value: 'Mudur' },
+  { label: 'Departman Müdürü', value: 'DepartmanMuduru' },
+  { label: 'Direktör', value: 'Direktor' },
+  { label: 'Genel Müdür', value: 'GenelMudur' },
+];
+
+const emptyPersonnel = {
+  ad: '',
+  soyad: '',
+  email: '',
+  departman: '',
+  unvan: '',
+  maas: '',
+  iseBaslamaTarihi: '',
+  telefon: '',
+  adres: '',
+  iban: '',
+  dogumTarihi: '',
+  experiences: []
 };
 </script>
