@@ -4,9 +4,18 @@ import api from '@/services/api';
 export const usePersonnelStore = defineStore('personnel', {
   state: () => ({
     personnels: [],
+    selectedDepartment: 'Tümü',
     loading: false,
     error: null
   }),
+  getters: {
+    filteredPersonnels(state) {
+      if (!state.selectedDepartment || state.selectedDepartment === 'Tümü') {
+        return state.personnels;
+      }
+      return state.personnels.filter(p => p.departman === state.selectedDepartment);
+    }
+  },
   actions: {
     async fetchPersonnels() {
       this.loading = true;
@@ -26,6 +35,7 @@ export const usePersonnelStore = defineStore('personnel', {
         this.personnels.push(response.data);
       } catch (err) {
         console.error('Personel ekleme hatası:', err);
+        throw err;
       }
     },
     async updatePersonnel(id, personnelData) {
@@ -37,6 +47,7 @@ export const usePersonnelStore = defineStore('personnel', {
         }
       } catch (err) {
         console.error('Personel güncelleme hatası:', err);
+        throw err;
       }
     },
     async deletePersonnel(id) {
