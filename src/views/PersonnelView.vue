@@ -212,4 +212,17 @@ const emptyPersonnel = {
   dogumTarihi: '',
   experiences: []
 };
+
+// Ayrılanları da getirmek için istek:
+const fetchPersonnel = async (includeInactive = false) => {
+  const url = includeInactive ? '/Personnel/getPersonnel?includeInactive=true' : '/Personnel/getPersonnel';
+  const response = await api.get(url);
+  personnels.value = response.data;
+};
+
+// Geri İşe Al Aksiyonu:
+const reactivate = async (id) => {
+  await api.put(`/Personnel/reactivatePersonnel/${id}`);
+  fetchPersonnel(true);
+};
 </script>
